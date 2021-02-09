@@ -1,11 +1,13 @@
-
-#4h 11m
-
 import time
-import subprocess
 import sys
+import random
 import os
 from os import path
+
+asciiListNumbers = [48,49,50,51,52,53,54,55,56,57]
+asciiListCapitals = [65,66,67,68,69,70,71,72,73,74,75,76,77,78,79,80,81,82,83,84,85,86,87,88,89,90]
+asciiListletters = [97,98,99,100,101,102,103,104,105,106,107,108,109,110,111,112,113,114,115,116,117,118,119,120,121,122]
+asciiListSpecial = [64,36,33,37]
 
 def access(choice):                                                     # choice: 0 -> prints list of userPasswords, 1 -> changes pin
     if path.exists("savedPin.txt"):
@@ -34,6 +36,7 @@ def access(choice):                                                     # choice
         f.write(newPin)
         f.close()
         time.sleep(1)
+        access(choice)
 
 def mainMenu():
     print("\nMenu")
@@ -67,10 +70,43 @@ def mainMenu():
         print("Please try again.")
         time.sleep(2)
         mainMenu()
-    
+
+def addToClipBoard(text):
+    command = 'echo | set /p nul=' + text + '| clip'
+    os.system(command)
+
 def generatePassword():
-    #to be completed
-    return 0
+    tempGen = []
+    generated = ""
+    
+    for i in range(10):
+        if i < 2:
+            num = random.randint(48,57)
+            tempGen.append(chr(num))
+        elif i < 5:
+            num = random.randint(65,90)
+            tempGen.append(chr(num))
+        elif i < 8:
+            num = random.randint(97,122)
+            tempGen.append(chr(num))
+        else:
+            num = random.randint(0,3)
+            num = asciiListSpecial[num]
+            tempGen.append(chr(num))
+        
+    counter = 9
+    while counter >= 0:
+        num = random.randint(0,counter)
+        counter -= 1
+        generated += tempGen[num]
+        tempGen.remove(tempGen[num])
+
+    addToClipBoard(generated)
+    print("Your code is: - " + generated + " -  and is already copied to your clipboard!")
+    platform = input("In which platform you will use it? ")
+    f = open("passwords.txt", "a")
+    f.write(platform + " - " + generated)
+    f.close
 
 def pinCheck(pin):                                                          # out: 0 -> Valid, 1 -> Error    
     try:
@@ -127,8 +163,7 @@ def changePin():
     else:
         print("\nSorry, not valid input!")
         time.sleep(2)
-        changePin()
-    
+        changePin()    
 
 if __name__ == "__main__":
     userPasswords(0)
